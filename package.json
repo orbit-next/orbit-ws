@@ -1,0 +1,20 @@
+{
+  "name": "orbit-ws",
+  "version": "0.1.0",
+  "description": "orbit adapter using websockets and browser client",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --build tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@types/node": "^13.13.5",
+    "@types/ws": "^7.2.4",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "ws": "^7.2.5"
+  }
+}

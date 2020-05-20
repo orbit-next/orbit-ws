@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>orbit-ws</title>
+  </head>
+  <style>
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: sans-serif;
+}
+h1 {
+  height: 56px;
+  font-size: 32px;
+  margin: 0;
+  padding: 8px 0;
+}
+h1.terminated {
+  color: #fff;
+  background-color: #aa0000;
+}
+body > div {
+  padding-bottom: 56px;
+}
+  </style>
+  <body>
+    <div>
+      <h1 id="heading">orbit-ws web terminal</h1>
+      <canvas id="canvas"></canvas>
+    </div>
+    <script src="/client.js"></script>
+  </body>
+</html>

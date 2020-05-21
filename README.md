@@ -25,7 +25,6 @@ Navigate to http://localhost:8080/ (or your chosen port) to use orbit-ws.
 ## Limitations
 
 - `orbitc` location, etc. are hardcoded.
-- the flood fill graphics operation is not yet supported.
 - some keyboard keys may not have been correctly mapped.
 - text input is confined to the visible portion of the screen
   and does not scroll.

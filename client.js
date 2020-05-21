@@ -686,6 +686,91 @@ class OrbitCanvas {
       this.dirty = true;
     }
   }
+
+  static _floodFillMakeSpan(y, x1, x2, rowNext, next) {
+    return {y, x1, x2, rowNext, next};
+  }
+
+  static _floodFillAddSpan(drawBuf, spanList, x, y, borderColor) {
+    let s;
+    let x1, x2;
+
+    x1 = x2 = x;
+    while (
+      (x1 > 0) &&
+      (drawBuf[(x1 - 1) + y * CANVAS_WIDTH] != borderColor)
+    ) x1--;
+    while (
+      (x2 < CANVAS_WIDTH - 1) &&
+      (drawBuf[(x2 + 1) + y * CANVAS_WIDTH] != borderColor)
+    ) x2++;
+
+    x = x2 + 1;
+    for (s = spanList[y]; s; s = s.rowNext) {
+      if ((x1 == s.x1) && (x2 == s.x2)) return [undefined, x];
+    }
+    s = OrbitCanvas._floodFillMakeSpan(y, x1, x2, spanList[y], undefined);
+    spanList[y] = s;
+
+    return [s, x];
+  }
+
+  floodFill(x, y, color, borderColor) {
+    debugger;
+    const drawBuf = this.drawBuf;
+    let spanList, s, tail, head;
+
+    if (
+      (x < 0) || (x >= CANVAS_WIDTH) ||
+      (y < 0) || (y >= CANVAS_HEIGHT)
+    ) {
+      return;
+    }
+
+    if (drawBuf[x + y * CANVAS_WIDTH] == borderColor) {
+      return;
+    }
+
+    spanList = Array.from({length: CANVAS_HEIGHT});
+
+    [head, x] = OrbitCanvas._floodFillAddSpan(drawBuf, spanList, x, y, borderColor);
+    tail = head;
+
+    while (tail) {
+      if (tail.y - 1 >= 0) {
+        for (x = tail.x1; x <= tail.x2; x++) {
+          if (drawBuf[x + (tail.y - 1) * CANVAS_WIDTH] != borderColor) {
+            [s, x] = OrbitCanvas._floodFillAddSpan(drawBuf, spanList, x, tail.y - 1, borderColor);
+            if (s) {
+              head.next = s;
+              head = s;
+            }
+          }
+        }
+      }
+      if (tail.y + 1 < CANVAS_HEIGHT) {
+        for (x = tail.x1; x <= tail.x2; x++) {
+          if (drawBuf[x + (tail.y + 1) * CANVAS_WIDTH] != borderColor) {
+            [s, x] = OrbitCanvas._floodFillAddSpan(drawBuf, spanList, x, tail.y + 1, borderColor);
+            if (s) {
+              head.next = s;
+              head = s;
+            }
+          }
+        }
+      }
+      tail = tail.next;
+    }
+
+    /* Fill spans */
+    for (y = 0; y < CANVAS_HEIGHT; y++) {
+      for (s = tail = spanList[y]; s; s = s.rowNext, tail = s) {
+        drawBuf.fill(color, s.y * CANVAS_WIDTH + s.x1, s.y * CANVAS_WIDTH + s.x2 + 1);
+      }
+    }
+
+    this.dirty = true;
+  }
 }
 
 const getFont = () => fetch('/font.bin').then(res => res.arrayBuffer());
@@ -776,7 +861,11 @@ const main = async () => {
           throw new TypeError('Out of bounds color');
         }
         oc.setPointColor(x, y, color);
-      }
+      } break;
+      case 0x94: {
+        const [x, y, color, borderColor] = new Int32Array(msg.data.buffer);
+        oc.floodFill(x, y, color, borderColor);
+      } break;
     }
   }
 };
